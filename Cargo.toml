@@ -1,0 +1,3 @@
+[workspace]
+resolver = "3"
+members = ["namc_animations","namc_core", "namc_macro", "namc_test"]
