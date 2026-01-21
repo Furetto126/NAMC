@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use nalgebra::Vector3;
 use slotmap::new_key_type;
 
-pub trait SceneObject: Debug {
+pub trait SceneObject {
     fn position(&self) -> Vector3<f64>;
     fn opacity(&self)  -> f64;
 

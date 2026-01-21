@@ -6,7 +6,7 @@ use crate::animation::{ParallelAnimation, Timeline};
 use super::{SceneObject, ObjectId};
 
 // Wrapper Type over SlotMap
-#[derive(Debug, Deref, DerefMut)]
+#[derive(Deref, DerefMut)]
 pub struct ObjectMap(SlotMap<ObjectId, Box<dyn SceneObject>>);
 
 impl ObjectMap {

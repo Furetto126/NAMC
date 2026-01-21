@@ -1,31 +1,11 @@
 use nalgebra::Vector3;
 use namc_animations::object_animations::CoreAnimations;
-use namc_core::{math::interpolate::LERP, scene::{Scene, SceneObject}};
+use namc_core::{math::interpolate::LERP, scene::Scene};
+use namc_macro::derive_scene_object;
 
-
+#[derive_scene_object]
 #[derive(Debug, Default)]
-struct MyObject {
-    position: Vector3<f64>,
-    opacity: f64
-}
-
-impl SceneObject for MyObject {
-    fn position(&self) -> Vector3<f64> {
-        self.position
-    }
-
-    fn opacity(&self)  -> f64 {
-        self.opacity
-    }
-
-    fn set_position(&mut self, pos: Vector3<f64>) {
-        self.position = pos;
-    }
-
-    fn set_opacity(&mut self, op: f64) {
-        self.opacity = op;
-    }
-}
+struct MyObject;
 
 fn main() {
     let mut scene = Scene::new();

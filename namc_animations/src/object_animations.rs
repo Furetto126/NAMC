@@ -1,7 +1,7 @@
 use namc_core::{animation::Animation, math::{InterpolationFunction, interpolate::LERP}, scene::{ObjectId, ObjectMap}};
-use namc_macro::animation;
+use namc_macro::derive_animation;
 
-#[animation]
+#[derive_animation]
 pub struct FadeIn {
     pub target: ObjectId,
 }

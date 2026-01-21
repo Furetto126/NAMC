@@ -5,8 +5,15 @@ use quote::quote;
 use syn::{Fields, parse_quote};
 
 #[proc_macro_attribute]
-pub fn animation(_: TokenStream, item: TokenStream) -> TokenStream {
+pub fn derive_animation(_: TokenStream, item: TokenStream) -> TokenStream {
     let mut input: syn::ItemStruct = syn::parse(item).unwrap();
+
+    if let Fields::Unit = input.fields {
+        input.fields = Fields::Named(syn::FieldsNamed {
+            brace_token: Default::default(),
+            named: syn::punctuated::Punctuated::new()
+        });
+    }
 
     match &mut input.fields {
         Fields::Named(fields_names) => {
@@ -19,7 +26,7 @@ pub fn animation(_: TokenStream, item: TokenStream) -> TokenStream {
             });
         }
         _ => {
-            return syn::Error::new_spanned(&input.ident, "Only named structs are supported by #[Animation].")
+            return syn::Error::new_spanned(&input.ident, "Only named structs are supported by #[derive_animation].")
                 .to_compile_error()
                 .into();
         }
@@ -86,3 +93,57 @@ pub fn animation(_: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
+#[proc_macro_attribute]
+pub fn derive_scene_object(_: TokenStream, item: TokenStream) -> TokenStream {
+    let mut input: syn::ItemStruct = syn::parse(item).unwrap();
+
+    if let Fields::Unit = input.fields {
+        input.fields = Fields::Named(syn::FieldsNamed {
+            brace_token: Default::default(),
+            named: syn::punctuated::Punctuated::new()
+        });
+    }
+
+    match &mut input.fields {
+        Fields::Named(fields_names) => {
+            fields_names.named.push(parse_quote! {
+                pub position: nalgebra::Vector3<f64>
+            });
+
+            fields_names.named.push(parse_quote! {
+                pub opacity: f64
+            });
+        }
+        _ => {
+            return syn::Error::new_spanned(&input.ident, "Only named structs are supported by #[derive_scene_object].")
+                .to_compile_error()
+                .into();
+        }
+    }
+
+    let struct_name = &input.ident;
+
+    // Implementing SceneObject Trait
+    // ------------------------------
+    let trait_impl = quote! {
+        impl namc_core::scene::SceneObject for #struct_name {
+            fn position(&self) -> Vector3<f64> {
+                self.position
+            }
+            fn opacity(&self) -> f64 {
+                self.opacity
+            }
+            fn set_position(&mut self, pos: Vector3<f64>) {
+                self.position = pos;
+            }
+            fn set_opacity(&mut self, op: f64) {
+                self.opacity = op;
+            }
+        }
+    };
+
+    quote! {
+        #input
+        #trait_impl
+    }.into()
+}
