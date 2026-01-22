@@ -7,7 +7,7 @@ pub trait Interpolable {
 
 impl Interpolable for f64 {
     fn interpolate(&self, other: &Self, t: f64) -> Self {
-        ((t-1.0) as f64)*self + (t as f64)*other
+        (1.0 - t) * self + t * other
     }
 }
 

@@ -42,7 +42,7 @@ pub fn derive_animation(_: TokenStream, item: TokenStream) -> TokenStream {
                 self.duration
             }
 
-            fn update(&self, t: f64, scene_objects: &mut namc_core::scene::ObjectMap) {
+            fn update(&mut self, t: f64, scene_objects: &mut namc_core::scene::ObjectMap) {
                 let anim_t = (self.interpolation_function)(t);
                 self.animate(anim_t, scene_objects);
             }

@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 namc_core = { path = "../namc_core" }
 namc_macro = { path = "../namc_macro" }
+nalgebra = "0.34.1"

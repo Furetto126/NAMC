@@ -16,13 +16,14 @@ fn main() {
         MyObject { position: [0.0, 0.0, 0.0].into(), opacity: 0.0 }
     );
     scene.play(
-        obj_handle1.fade_in(10.0, Some(LERP)) + obj_handle2.fade_in(6.0, Some(LERP))
+        obj_handle1.fade_in(10.0, Some(LERP)) +
+        obj_handle2.move_to([1.0, 2.0, 4.0].into(), 11.0, Some(LERP))
     );
     
     // Simulate rendering
     // ------------------
     let dt_ms = 100.0;
-    while scene.timeline.time < 10.0 {
+    while scene.timeline.time < 11.0 {
         scene.render_frame(dt_ms / 1000.0);
     }
 }

@@ -3,7 +3,7 @@ use crate::scene::ObjectMap;
 
 pub trait Animation {
     fn duration(&self) -> f64;
-    fn update(&self, t: f64, scene_objects: &mut ObjectMap);
+    fn update(&mut self, t: f64, scene_objects: &mut ObjectMap);
 }
 
 pub struct ParallelAnimation {
