@@ -1,5 +1,5 @@
 use nalgebra::Vector3;
-use namc_core::{animation::Animation, math::{InterpolationFunction, interpolate::LERP}, scene::{ObjectId, ObjectMap}};
+use namc_core::{animation::Animation, math::{InterpolationFunction, interpolate::LERP}, scene::{ObjectId, ObjectMap, SceneObject, scene_object::ObjectHandle}};
 use namc_macro::derive_animation;
 use namc_core::math::Interpolable;
 
@@ -33,18 +33,17 @@ impl MoveTo {
     }
 }
 
-
 pub trait CoreAnimations {
     fn fade_in(self, duration: f64, interpolation_function: Option<InterpolationFunction>) -> Box<dyn Animation>;
     fn move_to(self, target_pos: Vector3<f64>, duration: f64, interpolation_function: Option<InterpolationFunction>) -> Box<dyn Animation>;
 } 
 
-impl CoreAnimations for ObjectId {
+impl<T: SceneObject> CoreAnimations for ObjectHandle<T> {
     fn fade_in(self, duration: f64, interpolation_function: Option<InterpolationFunction>) -> Box<dyn Animation> {
-        FadeIn::new(self, duration, interpolation_function.unwrap_or(LERP))
+        FadeIn::new(self.raw, duration, interpolation_function.unwrap_or(LERP))
     }
 
     fn move_to(self, target_pos: Vector3<f64>, duration: f64, interpolation_function: Option<InterpolationFunction>) -> Box<dyn Animation> {
-        MoveTo::new(self, None, target_pos, duration, interpolation_function.unwrap_or(LERP))
+        MoveTo::new(self.raw, None, target_pos, duration, interpolation_function.unwrap_or(LERP))
     }
 }

@@ -1,11 +1,19 @@
 use nalgebra::Vector3;
 use namc_animations::object_animations::CoreAnimations;
-use namc_core::{math::interpolate::LERP, scene::Scene};
-use namc_macro::derive_scene_object;
+use namc_core::{math::interpolate::LERP, scene::{ObjectId, Scene}};
+use namc_macro::{derive_animation, derive_scene_object};
 
 #[derive_scene_object]
 #[derive(Debug, Default)]
 struct MyObject;
+
+#[derive_scene_object]
+#[derive(Debug, Default)]
+struct MyCircle {
+    radius: f64
+}
+
+// Implement new trait animation with new animation(s) to ObjectHandle<MyCircle>
 
 fn main() {
     let mut scene = Scene::new();

@@ -7,32 +7,28 @@ pub trait Animation {
 }
 
 pub struct ParallelAnimation {
+    duration: f64,
     elapsed: f64,
     animations: Vec<Box<dyn Animation>>
 }
 
 impl ParallelAnimation {
     pub fn new(a: Box<dyn Animation>, b: Box<dyn Animation>) -> Self {
-        Self { elapsed: 0.0, animations: vec![a, b] }
+        Self { elapsed: 0.0, duration: f64::max(a.duration(), b.duration()), animations: vec![a, b] }
     }
 
     pub fn from_single(a: Box<dyn Animation>) -> Self {
-        Self { elapsed: 0.0, animations: vec![a] }
+        Self { elapsed: 0.0, duration: a.duration(), animations: vec![a] }
     }
 
     pub fn push(mut self, anim: Box<dyn Animation>) -> Self {
+        self.duration = f64::max(self.duration, anim.duration());
         self.animations.push(anim);
         self
     }
 
     pub fn duration(&self) -> f64 {
-        let mut max_dur = f64::MIN;
-        for a in &self.animations {
-            max_dur = f64::max(a.duration(), max_dur);
-        }
-        max_dur
-
-        // TODO: Cache duration and update it on "animations" change
+        self.duration
     }
 
     pub fn elapsed(&self) -> f64 {

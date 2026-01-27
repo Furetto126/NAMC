@@ -1,8 +1,8 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, marker::PhantomData};
 use slotmap::SlotMap;
 use derive_more::{Deref, DerefMut};
 
-use crate::animation::{ParallelAnimation, Timeline};
+use crate::{animation::{ParallelAnimation, Timeline}, scene::scene_object::ObjectHandle};
 use super::{SceneObject, ObjectId};
 
 // Wrapper Type over SlotMap
@@ -32,18 +32,18 @@ impl Scene {
         Scene { timeline: Timeline::new(), objects: ObjectMap::new() }
     }
 
-    pub fn add_object<T>(&mut self, obj: T) -> ObjectId
+    pub fn add_object<T>(&mut self, obj: T) -> ObjectHandle<T>
     where T: SceneObject + 'static,
     {
-        self.objects.insert(Box::new(obj) as Box<dyn SceneObject>)
+        ObjectHandle::new(self.objects.insert(Box::new(obj) as Box<dyn SceneObject>))
     }
 
-    pub fn get_object(&self, object_id: ObjectId) -> Option<&dyn SceneObject> {
-        self.objects.get_object(object_id)
+    pub fn get_object<T: SceneObject>(&self, object_id: ObjectHandle<T>) -> Option<&dyn SceneObject> {
+        self.objects.get_object(object_id.raw)
     }
 
-    pub fn get_object_mut(&mut self, object_id: ObjectId) -> Option<&mut (dyn SceneObject + 'static)> {
-        self.objects.get_object_mut(object_id)
+    pub fn get_object_mut<T: SceneObject>(&mut self, object_id: ObjectHandle<T>) -> Option<&mut (dyn SceneObject + 'static)> {
+        self.objects.get_object_mut(object_id.raw)
     }
 
     pub fn play<T>(&mut self, animation: T)
