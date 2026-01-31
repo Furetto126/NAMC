@@ -14,11 +14,21 @@ impl ObjectMap {
         ObjectMap(SlotMap::with_key())
     }
 
-    pub fn get_object(&self, object_id: ObjectId) -> Option<&dyn SceneObject> {
-        self.0.get(object_id).map(|o| o.as_ref())
+    pub fn get_object<T: SceneObject>(&self, object_id: &ObjectHandle<T>) -> Option<&T> {
+        let dyn_obj = self.0.get(object_id.raw).map(|o| o.as_ref());
+        if dyn_obj.is_none() {
+            return None;
+        }
+
+        dyn_obj.unwrap().as_any().downcast_ref::<T>()
     }
-    pub fn get_object_mut(&mut self, object_id: ObjectId) -> Option<&mut (dyn SceneObject + 'static)> {
-        self.0.get_mut(object_id).map(|o| o.as_mut())
+    pub fn get_object_mut<T: SceneObject /* + 'static*/>(&mut self, object_id: &ObjectHandle<T>) -> Option<&mut T> {
+        let dyn_obj = self.0.get_mut(object_id.raw).map(|o| o.as_mut());
+        if dyn_obj.is_none() {
+            return None;
+        }
+
+        dyn_obj.unwrap().as_any_mut ().downcast_mut::<T>()
     }
 }
 
@@ -38,12 +48,12 @@ impl Scene {
         ObjectHandle::new(self.objects.insert(Box::new(obj) as Box<dyn SceneObject>))
     }
 
-    pub fn get_object<T: SceneObject>(&self, object_id: ObjectHandle<T>) -> Option<&dyn SceneObject> {
-        self.objects.get_object(object_id.raw)
+    pub fn get_object<T: SceneObject>(&self, object_id: &ObjectHandle<T>) -> Option<&T> {
+        self.objects.get_object(object_id)
     }
 
-    pub fn get_object_mut<T: SceneObject>(&mut self, object_id: ObjectHandle<T>) -> Option<&mut (dyn SceneObject + 'static)> {
-        self.objects.get_object_mut(object_id.raw)
+    pub fn get_object_mut<T: SceneObject>(&mut self, object_id: &ObjectHandle<T>) -> Option<&mut T> {
+        self.objects.get_object_mut(object_id)
     }
 
     pub fn play<T>(&mut self, animation: T)

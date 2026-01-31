@@ -33,11 +33,13 @@ pub fn derive_animation(_: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let struct_name = &input.ident;
+    let generics = &input.generics;
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     // Implementing Animation Trait
     // ----------------------------
     let trait_impl = quote! {
-        impl namc_core::animation::Animation for #struct_name {
+        impl #impl_generics namc_core::animation::Animation for #struct_name #ty_generics #where_clause {
             fn duration(&self) -> f64 {
                 self.duration
             }
@@ -77,7 +79,7 @@ pub fn derive_animation(_: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     let new_impl = quote! {
-        impl #struct_name {
+        impl #impl_generics #struct_name #ty_generics #where_clause {
             pub fn new(#(#params_defs),*) -> Box<Self> {
                 Box::new(Self {
                     #(#params_init),*
@@ -127,13 +129,16 @@ pub fn derive_scene_object(_: TokenStream, item: TokenStream) -> TokenStream {
     // ------------------------------
     let trait_impl = quote! {
         impl namc_core::scene::SceneObject for #struct_name {
-            fn position(&self) -> Vector3<f64> {
+            fn as_any(&self) -> &dyn std::any::Any { self }
+            fn as_any_mut(&mut self) -> &mut dyn std::any::Any { self }
+
+            fn position(&self) -> nalgebra::Vector3<f64> {
                 self.position
             }
             fn opacity(&self) -> f64 {
                 self.opacity
             }
-            fn set_position(&mut self, pos: Vector3<f64>) {
+            fn set_position(&mut self, pos: nalgebra::Vector3<f64>) {
                 self.position = pos;
             }
             fn set_opacity(&mut self, op: f64) {

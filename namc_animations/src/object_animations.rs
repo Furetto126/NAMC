@@ -4,26 +4,26 @@ use namc_macro::derive_animation;
 use namc_core::math::Interpolable;
 
 #[derive_animation]
-pub struct FadeIn {
-    pub target: ObjectId,
+pub struct FadeIn<T: SceneObject> {
+    pub target: ObjectHandle<T>,
 }
-impl FadeIn {
+impl<T: SceneObject> FadeIn<T> {
     pub fn animate(&mut self, t: f64, scene_objects: &mut ObjectMap) {
-        let object = scene_objects.get_object_mut(self.target).expect("Invalid ObjectId: ID not present in ObjectMap");
+        let object = scene_objects.get_object_mut(&self.target).expect("Invalid ObjectId: ID not present in ObjectMap");
         object.set_opacity(t);
     }
 }
 
 #[derive_animation]
-pub struct MoveTo {
-    pub target: ObjectId,
+pub struct MoveTo<T: SceneObject> {
+    pub target: ObjectHandle<T>,
     pub start_pos: Option<Vector3<f64>>,
     pub target_pos: Vector3<f64>,
 
 }
-impl MoveTo {
+impl<T: SceneObject> MoveTo<T> {
     pub fn animate(&mut self, t: f64, scene_objects: &mut ObjectMap) {
-        let object = scene_objects.get_object_mut(self.target).expect("Invalid ObjectId: ID not present in ObjectMap");
+        let object = scene_objects.get_object_mut(&self.target).expect("Invalid ObjectId: ID not present in ObjectMap");
 
         if self.start_pos.is_none() {
             self.start_pos = Some(object.position());
@@ -40,10 +40,10 @@ pub trait CoreAnimations {
 
 impl<T: SceneObject> CoreAnimations for ObjectHandle<T> {
     fn fade_in(self, duration: f64, interpolation_function: Option<InterpolationFunction>) -> Box<dyn Animation> {
-        FadeIn::new(self.raw, duration, interpolation_function.unwrap_or(LERP))
+        FadeIn::new(self, duration, interpolation_function.unwrap_or(LERP))
     }
 
     fn move_to(self, target_pos: Vector3<f64>, duration: f64, interpolation_function: Option<InterpolationFunction>) -> Box<dyn Animation> {
-        MoveTo::new(self.raw, None, target_pos, duration, interpolation_function.unwrap_or(LERP))
+        MoveTo::new(self, None, target_pos, duration, interpolation_function.unwrap_or(LERP))
     }
 }
